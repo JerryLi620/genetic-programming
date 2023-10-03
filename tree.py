@@ -31,7 +31,22 @@ class Tree():
             node.value = str(number)
 
     def evaluate(self, node, val):
-        return
+        
+        left_val = self.evaluate(node.left, val)
+        right_val = self.evaluate(node.right, val)
+
+        if node.value == '+':
+            return left_val + right_val
+        if node.value == '-':
+            return left_val - right_val
+        if node.value == '*':
+            return left_val * right_val
+        if node.value == '/':
+            if right_val == 0:
+                raise ValueError("Division by zero")
+            else:
+                return left_val / right_val
+
 
     def get_random_node(self, node):
         stack = [node]
