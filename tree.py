@@ -6,10 +6,13 @@ class Tree():
     def __init__(self, root):
         self.root = root
 
-    def crossover(self,):
-        node1 = self.get_mutate_node(self.root)
-        node2 = self.get_mutate_node(self.root)
-        return
+    def crossover(self, other):
+        node1 = self.select_random_node(self.root)
+        node2 = self.select_random_node(other.root)
+
+        node1.value, node2.value = node2.value, node1.value
+        node1.left, node2.left = node2.left, node1.left
+        node1.right, node2.right = node2.right, node1.right
 
     def mutate(self):
         node = self.get_random_leaf(self.root)
@@ -27,8 +30,20 @@ class Tree():
             number = random.randint(-3, 3)
             node.value = str(number)
 
-    def evaluate():
+    def evaluate(self, node, val):
         return
+
+    def get_random_node(self, node):
+        stack = [node]
+        nodes = []
+        while stack:
+            current = stack.pop()
+            nodes.append(current)
+            if current.left:
+                stack.append(current.left)
+            if current.right:
+                stack.append(current.right)
+        return random.choice(nodes)
 
     def get_random_leaf(self, node):
         queue = collections.deque([node])
