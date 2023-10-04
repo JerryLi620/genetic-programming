@@ -31,6 +31,8 @@ class Tree():
             node.value = str(number)
 
     def evaluate(self, node, val):
+
+        # missing base-case here
         
         left_val = self.evaluate(node.left, val)
         right_val = self.evaluate(node.right, val)
