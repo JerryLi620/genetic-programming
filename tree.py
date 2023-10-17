@@ -90,45 +90,45 @@ class Node():
         return self.data
 
 
-# Test cases here
-# Test 1: Complex Tree Creation and Evaluation
-node1 = Node("x")
-node2 = Node("5")
-node3 = Node("+", node1, node2)
+# # Test cases here
+# # Test 1: Complex Tree Creation and Evaluation
+# node1 = Node("x")
+# node2 = Node("5")
+# node3 = Node("+", node1, node2)
 
-node4 = Node("x")
-node5 = Node("3")
-node6 = Node("-", node4, node5)
+# node4 = Node("x")
+# node5 = Node("3")
+# node6 = Node("-", node4, node5)
 
-node7 = Node("*", node3, node6)
+# node7 = Node("*", node3, node6)
 
-node8 = Node("2")
-root1 = Node("/", node7, node8)
+# node8 = Node("2")
+# root1 = Node("/", node7, node8)
 
-tree1 = Tree(root1)
+# tree1 = Tree(root1)
 
-print("Initial complex tree1 evaluation for x=4:", tree1.evaluate(tree1.root, 4))
+# print("Initial complex tree1 evaluation for x=4:", tree1.evaluate(tree1.root, 4))
 
-# Test 2: Mutation
-tree1.mutate()
-print("Complex tree1 after mutation, evaluation for x=4:", tree1.evaluate(tree1.root, 4))
+# # Test 2: Mutation
+# tree1.mutate()
+# print("Complex tree1 after mutation, evaluation for x=4:", tree1.evaluate(tree1.root, 4))
 
-# Test 3: Crossover
-node9 = Node("x")
-node10 = Node("2")
-node11 = Node("*", node9, node10)
+# # Test 3: Crossover
+# node9 = Node("x")
+# node10 = Node("2")
+# node11 = Node("*", node9, node10)
 
-node12 = Node("x")
-node13 = Node("3")
-node14 = Node("/", node12, node13)
+# node12 = Node("x")
+# node13 = Node("3")
+# node14 = Node("/", node12, node13)
 
-root2 = Node("-", node11, node14)
+# root2 = Node("-", node11, node14)
 
-tree2 = Tree(root2)
+# tree2 = Tree(root2)
 
-print("Initial complex tree2 evaluation for x=4:", tree2.evaluate(tree2.root, 4))
+# print("Initial complex tree2 evaluation for x=4:", tree2.evaluate(tree2.root, 4))
 
-tree1.crossover(tree2)
+# tree1.crossover(tree2)
 
-print("Complex tree1 after crossover, evaluation for x=4:", tree1.evaluate(tree1.root, 4))
-print("Complex tree2 after crossover, evaluation for x=4:", tree2.evaluate(tree2.root, 4))
+# print("Complex tree1 after crossover, evaluation for x=4:", tree1.evaluate(tree1.root, 4))
+# print("Complex tree2 after crossover, evaluation for x=4:", tree2.evaluate(tree2.root, 4))
