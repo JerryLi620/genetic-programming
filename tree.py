@@ -18,6 +18,15 @@ class Tree():
             if not cur.left and not cur.right:
                 self.leaf.append(cur)
 
+    def get_depth(self, node=None):
+        if not node:
+            node = self.root
+        if not node.left and not node.right:
+            return 1
+        left_depth = self.get_depth(node.left) if node.left else 0
+        right_depth = self.get_depth(node.right) if node.right else 0
+        return 1 + max(left_depth, right_depth)
+
     def crossover(self, other):
         tree1 = Tree(self.root)
         tree2 = Tree(other.root)

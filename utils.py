@@ -28,6 +28,13 @@ def generate_random_nodes(node, depth, terminal_set, function_set, early_stop_pr
     return node
 
 
+def train_test_split(dataset, test_ratio=0.2):
+    random.shuffle(dataset)
+    test_size = int(len(dataset) * test_ratio)
+    test_set = dataset[:test_size]
+    train_set = dataset[test_size:]
+    return train_set, test_set
+
 # terminal_set = ['+', '-', '*', '/']
 # function_set = ['x'] + [str(i) for i in range(-5, 6)]
 
