@@ -13,10 +13,14 @@ class GeneticProgramming:
 
         self.population = generate_random_trees_list(
             population_size, max_depth, terminal_set, function_set, early_stop)
-        print(self.population)
 
-        self.fitness = [(tree, self.evaluate(tree))
-                        for tree in self.population]
+        self.fitness = self.generate_fitness()
+
+    def generate_fitness(self):
+        fitness = []
+        for tree in self.population:
+            fitness.append((tree, self.evaluate(tree)))
+        return fitness
 
     def select_fit_nodes(self, tournament_ratio=20):
         selected_for_tournament = random.sample(
@@ -38,16 +42,17 @@ class GeneticProgramming:
     def evaluate(self, tree):
         error = 0
         for x, y in self.dataset:
-            prediction = tree.evaluate(tree.root, x)
+            prediction = tree.evaluate_tree(tree.root, x)
             error += (prediction - y) ** 2
         return error / len(self.dataset)
 
-    def terminate(self, current_generation, satisfactory_fitness):
-        if current_generation >= self.max_generations:
-            return True
+    def terminate(self, satisfactory_fitness=0.1):
         best_fitness = min(self.fitness, key=lambda x: x[1])[1]
         if best_fitness <= satisfactory_fitness:
             return True
+
+    def eval_best_child(self):
+        return self.evaluate(max(self.fitness, key=lambda x: x[1])[0])
 
     def genetic_algorithm(self, num_run, crossover_prob):
         for _ in range(num_run):
@@ -58,21 +63,22 @@ class GeneticProgramming:
 
                     # Crossover
                     if rand < crossover_prob:
-                        parent1 = self.select_fit_nodes(self.population)
-                        parent2 = self.select_fit_nodes(self.population)
-                        offspring = parent1.crossover(parent1, parent2)
-                        new_population.append(offspring)
+                        parent1 = self.select_fit_nodes()
+                        parent2 = self.select_fit_nodes()
+                        offspring1, offspring2 = parent1.crossover(parent2)
+                        new_population.append(offspring1)
+                        new_population.append(offspring2)
 
                     # Mutation
                     else:
-                        individual = self.select_fit_nodes(self.population)
-                        mutant = individual.mutate(individual)
+                        individual = self.select_fit_nodes()
+                        mutant = individual.mutate()
                         new_population.append(mutant)
 
                 # Replace the old population with the new population
                 self.population = new_population[:]
-
+                self.generate_fitness()
                 # Check termination criterion for the run (assuming it's a function)
-                if self.terminate(self.population):
+                if self.terminate():
                     break
         return self.population

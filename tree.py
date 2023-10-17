@@ -43,23 +43,23 @@ class Tree():
             if choice == "constant":
                 options = [1, -1]
                 option = random.choice(options)
-                node.value = int(node.value)+option
+                node.value = str(int(node.value)+option)
             else:
                 node.value = "x"
         else:
             number = random.randint(-3, 3)
-            print(number)
             node.value = str(number)
+        return new_tree
 
-    def evaluate(self, node, val):
+    def evaluate_tree(self, node, val):
         if not node.left and not node.right:
             if node.value == 'x':
                 return val
             else:
                 return int(node.value)
 
-        left_val = self.evaluate(node.left, val)
-        right_val = self.evaluate(node.right, val)
+        left_val = self.evaluate_tree(node.left, val)
+        right_val = self.evaluate_tree(node.right, val)
 
         if node.value == '+':
             return left_val + right_val
@@ -106,45 +106,50 @@ class Node():
         return self.value
 
 
-# # Test cases here
-# # Test 1: Complex Tree Creation and Evaluation
-# node1 = Node("x")
-# node2 = Node("5")
-# node3 = Node("+", node1, node2)
+# Test cases here
+# Test 1: Complex Tree Creation and Evaluation
+node1 = Node("x")
+node2 = Node("5")
+node3 = Node("+", node1, node2)
 
-# node4 = Node("x")
-# node5 = Node("3")
-# node6 = Node("-", node4, node5)
+node4 = Node("x")
+node5 = Node("3")
+node6 = Node("-", node4, node5)
 
-# node7 = Node("*", node3, node6)
+node7 = Node("*", node3, node6)
 
-# node8 = Node("2")
-# root1 = Node("/", node7, node8)
+node8 = Node("2")
+root1 = Node("/", node7, node8)
 
-# tree1 = Tree(root1)
+tree1 = Tree(root1)
 
-# print("Initial complex tree1 evaluation for x=4:", tree1.evaluate(tree1.root, 4))
+print("Initial complex tree1 evaluation for x=4:",
+      tree1.evaluate_tree(tree1.root, 4))
 
-# # Test 2: Mutation
-# tree1.mutate()
-# print("Complex tree1 after mutation, evaluation for x=4:", tree1.evaluate(tree1.root, 4))
+# Test 2: Mutation
+tree1.mutate()
+print("Complex tree1 after mutation, evaluation for x=4:",
+      tree1.evaluate_tree(tree1.root, 4))
 
-# # Test 3: Crossover
-# node9 = Node("x")
-# node10 = Node("2")
-# node11 = Node("*", node9, node10)
+# Test 3: Crossover
+node9 = Node("x")
+node10 = Node("2")
+node11 = Node("*", node9, node10)
 
-# node12 = Node("x")
-# node13 = Node("3")
-# node14 = Node("/", node12, node13)
+node12 = Node("x")
+node13 = Node("3")
+node14 = Node("/", node12, node13)
 
-# root2 = Node("-", node11, node14)
+root2 = Node("-", node11, node14)
 
-# tree2 = Tree(root2)
+tree2 = Tree(root2)
 
-# print("Initial complex tree2 evaluation for x=4:", tree2.evaluate(tree2.root, 4))
+print("Initial complex tree2 evaluation for x=4:",
+      tree2.evaluate_tree(tree2.root, 4))
 
-# tree1.crossover(tree2)
+tree1.crossover(tree2)
 
-# print("Complex tree1 after crossover, evaluation for x=4:", tree1.evaluate(tree1.root, 4))
-# print("Complex tree2 after crossover, evaluation for x=4:", tree2.evaluate(tree2.root, 4))
+print("Complex tree1 after crossover, evaluation for x=4:",
+      tree1.evaluate_tree(tree1.root, 4))
+print("Complex tree2 after crossover, evaluation for x=4:",
+      tree2.evaluate_tree(tree2.root, 4))
