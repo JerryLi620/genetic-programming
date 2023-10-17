@@ -1,5 +1,5 @@
-from collections import deque
 import random
+
 
 class Tree():
     def __init__(self, root):
@@ -31,9 +31,8 @@ class Tree():
         # Swap the children
         node1.left, node2.left = node2.left, node1.left
         node1.right, node2.right = node2.right, node1.right
-        
-        return tree1, tree2
 
+        return tree1, tree2
 
     def mutate(self):
         new_tree = Tree(self.root)
@@ -79,7 +78,24 @@ class Tree():
 
     def get_random_leaf(self):
         return random.choice(self.leaf)
-    
+
+    def __str__(self):
+        return self._inorder_string(self.root)
+
+    def _inorder_string(self, node):
+        if not node:
+            return ""
+
+        # If leaf node
+        if not node.left and not node.right:
+            return str(node.value)
+
+        left_str = self._inorder_string(node.left)
+        right_str = self._inorder_string(node.right)
+
+        return f"({left_str} {node.value} {right_str})"
+
+
 class Node():
     def __init__(self, value, left=None, right=None):
         self.value = value
@@ -87,7 +103,7 @@ class Node():
         self.right = right
 
     def __str__(self):
-        return self.data
+        return self.value
 
 
 # # Test cases here
