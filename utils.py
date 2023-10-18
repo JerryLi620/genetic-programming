@@ -3,15 +3,11 @@ from tree import *
 
 
 def generate_random_trees_list(number, depth, terminal_set, function_set, early_stop_prob):
-    trees = []
-    for _ in range(number):
-        node = generate_random_nodes(
-            None, depth, terminal_set, function_set, early_stop_prob, is_root=True)
-        trees.append(Tree(node))
-    return trees
+    return [Tree(generate_random_nodes(None, depth, terminal_set, function_set, early_stop_prob)) for _ in range(number)]
 
 
-def generate_random_nodes(node, depth, terminal_set, function_set, early_stop_prob, is_root=False):
+
+def generate_random_nodes(node, depth, terminal_set, function_set, early_stop_prob):
     if depth == 0 or random.random() < early_stop_prob:
         # Only select from terminal_set if depth is 0 or with early stopping probability
         node = Node(random.choice(terminal_set))

@@ -1,12 +1,6 @@
 from utils import generate_random_trees_list, train_test_split
 import random
 
-
-"""
-Class for performing genetic programming.
-"""
-
-
 class GeneticProgramming:
     def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate):
         """
@@ -106,10 +100,10 @@ class GeneticProgramming:
         True if best fitness is below the threshold, otherwise False.
         """
         best_fitness = min(self.fitness, key=lambda x: x[1])[1]
-        if best_fitness <= satisfactory_fitness:
-            return True
+        return best_fitness <= satisfactory_fitness
 
-    def genetic_algorithm(self, num_run, crossover_rate, regularization_lambda=0.01):
+
+    def genetic_algorithm(self, num_run, crossover_rate):
         """
         Main genetic algorithm loop for evolving trees.
 
@@ -144,7 +138,7 @@ class GeneticProgramming:
                         parent2 = self.select_fit_nodes()
                         offspring1, offspring2 = parent1.crossover(parent2)
                         new_population.append(parent1)
-                        new_population.append(parent1)
+                        new_population.append(parent2)
                         new_population.append(offspring1)
                         new_population.append(offspring2)
 

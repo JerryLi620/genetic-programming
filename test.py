@@ -47,8 +47,6 @@ from utils import *
 # print("Best Child:", max(gp.fitness, key=lambda x: x[1])[0])
 
 
-# Assuming the CSV data is saved in a file named "data.csv"
-
 # Load dataset
 dataset = []
 with open("dataset1.csv", 'r') as file:
@@ -63,15 +61,15 @@ MAX_DEPTH = 3
 MAX_GENERATIONS = 200
 TERMINAL_SET = ["x"] + [str(i) for i in range(-1, 2)]
 FUNCTION_SET = ["+", "-", "*", "/"]
-EARLY_STOP_PROB = 0.1
-CROSSOVER_RATE = 0.9
+EARLY_STOP_PROB = 0
+CROSSOVER_RATE = 0.5
 
 # Initialize the GeneticProgramming
 gp = GeneticProgramming(dataset, POPULATION_SIZE, MAX_DEPTH, MAX_GENERATIONS,
                         TERMINAL_SET, FUNCTION_SET, EARLY_STOP_PROB, CROSSOVER_RATE)
 
 # Run the genetic algorithm
-NUM_RUN = 10
+NUM_RUN = 5
 best_trees = gp.genetic_algorithm(NUM_RUN, CROSSOVER_RATE)
 # Evaluate the best individual in the final population
 best_tree = min(gp.fitness, key=lambda x: x[1])[0]
