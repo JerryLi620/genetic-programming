@@ -61,7 +61,7 @@ MAX_DEPTH = 3
 MAX_GENERATIONS = 200
 TERMINAL_SET = ["x"] + [str(i) for i in range(-1, 2)]
 FUNCTION_SET = ["+", "-", "*", "/"]
-EARLY_STOP_PROB = 0.2
+EARLY_STOP_PROB = 0.1
 CROSSOVER_RATE = 0.5
 
 # Initialize the GeneticProgramming
