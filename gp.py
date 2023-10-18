@@ -8,7 +8,7 @@ Class for performing genetic programming.
 
 
 class GeneticProgramming:
-    def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate=0.7):
+    def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate):
         """
         Initialize the genetic programming class
 
@@ -28,9 +28,11 @@ class GeneticProgramming:
         self.max_generations = max_generations
         self.terminal_set = terminal_set
         self.function_set = function_set
-        self.population = generate_random_trees_list(
-            population_size, max_depth, terminal_set, function_set, early_stop)
-        self.fitness = self.generate_fitness()
+        self.early_stop = early_stop
+        # self.population = generate_random_trees_list(
+        #     population_size, max_depth, terminal_set, function_set, early_stop)
+        # self.fitness = self.generate_fitness()
+        self.crossover_rate = crossover_rate
 
     def generate_fitness(self):
         """
@@ -53,28 +55,7 @@ class GeneticProgramming:
         """
         selected_for_tournament = random.sample(
             self.fitness, self.population_size//tournament_ratio)
-        return max(selected_for_tournament, key=lambda x: x[1])[0]
-
-    def reproduce(self, parents):
-        """
-        Create offspring from given parents.
-
-        Params:
-        @parents: List of trees to reproduce.
-
-        Return: 
-        List of offspring.
-        """
-        new_population = []
-        for i in range(0, self.population_size, 2):
-            parent1 = parents[i]
-            parent2 = parents[i + 1]
-            child1, child2 = parent1.crossover(parent2)
-            new_population.extend([child1, child2])
-        for child in new_population:
-            if random.random() < (1 - self.crossover_rate):
-                child.mutate()
-        return new_population
+        return min(selected_for_tournament, key=lambda x: x[1])[0]
 
     def evaluate(self, tree, regularization_lambda=0.01):
         """
@@ -87,13 +68,14 @@ class GeneticProgramming:
         Return: 
         The error with depth penalty.
         """
-        error = 0
+        total_absolute_error = 0
         for x, y in self.dataset:
             prediction = tree.evaluate_tree(tree.root, x)
-            error += (prediction - y) ** 2
+            absolute_error = abs(prediction - y)
+            total_absolute_error += absolute_error
         depth_penalty = regularization_lambda * tree.get_depth()
-        error += depth_penalty
-        return error / len(self.dataset)
+        total_absolute_error += depth_penalty
+        return total_absolute_error
 
     def evaluate_test_set(self, tree, test_set):
         """
@@ -106,11 +88,12 @@ class GeneticProgramming:
         Return: 
         Error on the test set.
         """
-        error = 0
+        total_absolute_error = 0
         for x, y in test_set:
             prediction = tree.evaluate_tree(tree.root, x)
-            error += (prediction - y) ** 2
-        return error / len(test_set)
+            absolute_error = abs(prediction - y)
+            total_absolute_error += absolute_error
+        return total_absolute_error
 
     def terminate(self, satisfactory_fitness=0.1):
         """
@@ -147,9 +130,12 @@ class GeneticProgramming:
         best_tree_error = float('inf')
 
         for _ in range(num_run):
+            self.population = generate_random_trees_list(
+                self.population_size, self.max_depth, self.terminal_set, self.function_set, self.early_stop)
+            self.fitness = self.generate_fitness()
             for _ in range(self.max_generations):
                 new_population = []
-                for i in range(self.population_size):
+                for _ in range(self.population_size):
                     rand = random.random()
 
                     # Crossover
@@ -157,6 +143,8 @@ class GeneticProgramming:
                         parent1 = self.select_fit_nodes()
                         parent2 = self.select_fit_nodes()
                         offspring1, offspring2 = parent1.crossover(parent2)
+                        new_population.append(parent1)
+                        new_population.append(parent1)
                         new_population.append(offspring1)
                         new_population.append(offspring2)
 
@@ -164,13 +152,18 @@ class GeneticProgramming:
                     else:
                         individual = self.select_fit_nodes()
                         mutant = individual.mutate()
+                        new_population.append(individual)
                         new_population.append(mutant)
                 # Replace the old population with the new population
-                self.population = new_population[:]
-                self.generate_fitness()
-                # Check termination criterion for the run (assuming it's a function)
+                self.population = new_population
+                self.fitness = self.generate_fitness()
+                # Check termination criterion for the run
                 if self.terminate():
                     break
+                print("The best tree is:", min(
+                    self.fitness, key=lambda x: x[1])[0])
+                print("Its fitness (error) is:", min(
+                    self.fitness, key=lambda x: x[1])[1])
 
             # Evaluate each tree on the test set and store the best one
             for tree in self.population:

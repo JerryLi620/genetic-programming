@@ -58,22 +58,21 @@ with open("dataset1.csv", 'r') as file:
         dataset.append((float(x), float(fx)))
 
 # Constants for the GeneticProgramming
-POPULATION_SIZE = 100
-MAX_DEPTH = 5
-MAX_GENERATIONS = 50
-TERMINAL_SET = ["x"] + [str(i) for i in range(-5, 6)]
+POPULATION_SIZE = 200
+MAX_DEPTH = 3
+MAX_GENERATIONS = 200
+TERMINAL_SET = ["x"] + [str(i) for i in range(-1, 2)]
 FUNCTION_SET = ["+", "-", "*", "/"]
 EARLY_STOP_PROB = 0.1
-CROSSOVER_RATE = 0.7
+CROSSOVER_RATE = 0.9
 
 # Initialize the GeneticProgramming
 gp = GeneticProgramming(dataset, POPULATION_SIZE, MAX_DEPTH, MAX_GENERATIONS,
                         TERMINAL_SET, FUNCTION_SET, EARLY_STOP_PROB, CROSSOVER_RATE)
 
 # Run the genetic algorithm
-NUM_RUN = 5
+NUM_RUN = 10
 best_trees = gp.genetic_algorithm(NUM_RUN, CROSSOVER_RATE)
-
 # Evaluate the best individual in the final population
 best_tree = min(gp.fitness, key=lambda x: x[1])[0]
 print("The best tree is:", best_tree)
