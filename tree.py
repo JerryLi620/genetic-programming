@@ -1,4 +1,5 @@
 import random
+import copy
 
 
 class Tree():
@@ -28,8 +29,8 @@ class Tree():
         return 1 + max(left_depth, right_depth)
 
     def crossover(self, other):
-        tree1 = Tree(self.root)
-        tree2 = Tree(other.root)
+        tree1 = Tree(copy.deepcopy(self.root))
+        tree2 = Tree(copy.deepcopy(other.root))
 
         node1 = tree1.get_random_node()
         node2 = tree2.get_random_node()
@@ -44,7 +45,7 @@ class Tree():
         return tree1, tree2
 
     def mutate(self):
-        new_tree = Tree(self.root)
+        new_tree = Tree(copy.deepcopy(self.root))
         node = new_tree.get_random_leaf()
         choices = ["constant", "variable"]
         if node.value.isnumeric():
@@ -56,7 +57,7 @@ class Tree():
             else:
                 node.value = "x"
         else:
-            number = random.randint(-1, 1)
+            number = random.randint(-3, 3)
             node.value = str(number)
         return new_tree
 
