@@ -29,13 +29,13 @@ class GeneticProgramming:
         # self.fitness = self.generate_fitness()
         self.crossover_rate = crossover_rate
 
-    def generate_fitness(self):
+    def generate_fitness(self, train_set):
         """
         Calculate and return the fitness for all trees in the population.
         """
         fitness = []
         for tree in self.population:
-            fitness.append((tree, self.evaluate(tree)))
+            fitness.append((tree, self.evaluate(train_set, tree)))
         return fitness
 
     def select_fit_nodes(self, tournament_ratio=20):
@@ -52,7 +52,7 @@ class GeneticProgramming:
             self.fitness, self.population_size//tournament_ratio)
         return min(selected_for_tournament, key=lambda x: x[1])[0]
 
-    def evaluate(self, tree, regularization_lambda=100):
+    def evaluate(self, train_set, tree, regularization_lambda=10):
         """
         Evaluate the tree's performance on the TRAINING set with a penalty for tree depth to prevent overfitting.
 
@@ -63,14 +63,16 @@ class GeneticProgramming:
         Return: 
         The error with depth penalty.
         """
-        total_absolute_error = 0
-        for x, y in self.dataset:
+
+        total_error = 0
+        for x, y in train_set:
             prediction = tree.evaluate_tree(tree.root, x)
-            absolute_error = abs(prediction - y)
-            total_absolute_error += absolute_error
+            error = abs(prediction - y)
+            total_error += error
+
         depth_penalty = regularization_lambda * tree.get_depth()
-        total_absolute_error += depth_penalty
-        return total_absolute_error
+        total_error += depth_penalty 
+        return total_error/len(train_set)
 
     def evaluate_test_set(self, tree, test_set):
         """
@@ -83,12 +85,12 @@ class GeneticProgramming:
         Return: 
         Error on the test set.
         """
-        total_absolute_error = 0
+        total_error = 0
         for x, y in test_set:
             prediction = tree.evaluate_tree(tree.root, x)
-            absolute_error = abs(prediction - y)
-            total_absolute_error += absolute_error
-        return total_absolute_error
+            error = abs(prediction - y)
+            total_error += error 
+        return total_error/len(test_set)
 
     def terminate(self, satisfactory_fitness=0.1):
         """
@@ -124,10 +126,13 @@ class GeneticProgramming:
         best_tree_error = float('inf')
 
         for _ in range(num_run):
+            print("start")
             self.population = generate_random_trees_list(
                 self.population_size, self.max_depth, self.terminal_set, self.function_set, self.early_stop)
-            self.fitness = self.generate_fitness()
-            for _ in range(self.max_generations):
+            print("population created")
+            self.fitness = self.generate_fitness(train_set)
+            print("fitness created")
+            for i in range(self.max_generations):
                 new_population = []
                 for _ in range(self.population_size):
                     rand = random.random()
@@ -150,7 +155,7 @@ class GeneticProgramming:
                         new_population.append(mutant)
                 # Replace the old population with the new population
                 self.population = new_population
-                self.fitness = self.generate_fitness()
+                self.fitness = self.generate_fitness(train_set)
                 # Check termination criterion for the run
                 if self.terminate():
                     break

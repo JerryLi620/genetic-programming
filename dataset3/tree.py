@@ -35,31 +35,26 @@ class Tree():
 
         node1 = tree1.get_random_node()
         node2 = tree2.get_random_node()
-
+        
         # Swap the values
         node1.value, node2.value = node2.value, node1.value
 
         # Swap the children
         node1.left, node2.left = node2.left, node1.left
         node1.right, node2.right = node2.right, node1.right
-
+        if node1.value in ["sin", "log", "e"]:
+            node1.right = None
+        if node2.value in ["sin", "log", "e"]:
+            node2.right = None
         return tree1, tree2
 
     def mutate(self):
         new_tree = Tree(copy.deepcopy(self.root))
         node = new_tree.get_random_leaf()
-        choices = ["constant", "variable", "unary_function"]
-        choice = random.choice(choices)
-        if choice == "constant":
-            node.value = str(random.randint(-3, 3))
-        elif choice == "variable":
+        if node.value != "x":
             node.value = "x"
         else:
-            node.value = random.choice(["sin", "log", "e"])
-            # Ensure the node has only a left child
-            node.right = None
-            if not node.left:
-                node.left = Node("x")
+            node.value = str(random.randint(0, 2))
         return new_tree
 
     def evaluate_tree(self, node, val):
@@ -81,14 +76,14 @@ class Tree():
             elif node.value == "log":
                 # Ensure the value is positive before taking log
                 if arg_val <= 0:
-                    return float('-inf')
+                    return 0
                 return math.log(arg_val)
             elif node.value == "e":
                 try:
                     return math.exp(arg_val)
                 except OverflowError:
                     # Return positive infinity for large values
-                    return float('inf')
+                    return 0
 
         left_val = self.evaluate_tree(node.left, val)
         right_val = self.evaluate_tree(node.right, val)

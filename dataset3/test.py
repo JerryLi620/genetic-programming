@@ -11,7 +11,7 @@ max_x = float('-inf')
 min_fx = float('inf')
 max_fx = float('-inf')
 
-with open("dataset3/dataset3.csv", 'r') as file:
+with open("dataset3.csv", 'r') as file:
     lines = file.readlines()[1:]  # Skip the header
     for line in lines:
         x, fx = map(float, line.strip().split(','))
@@ -21,7 +21,7 @@ with open("dataset3/dataset3.csv", 'r') as file:
         max_fx = max(max_fx, fx)
 
 # Normalize the values to [-10,10]
-with open("dataset3/dataset3.csv", 'r') as file:
+with open("dataset3.csv", 'r') as file:
     lines = file.readlines()[1:]  # Skip the header
     for line in lines:
         x, fx = map(float, line.strip().split(','))
@@ -30,11 +30,11 @@ with open("dataset3/dataset3.csv", 'r') as file:
         dataset.append((normalized_x, normalized_fx))
 
 # Constants for the GeneticProgramming
-POPULATION_SIZE = 200
+POPULATION_SIZE = 400
 MAX_DEPTH = 3
 MAX_GENERATIONS = 200
-TERMINAL_SET = ["x"] + [str(i) for i in range(-1, 2)]
-FUNCTION_SET = ["+", "-", "*", "/", "sin", "log", "e"]
+TERMINAL_SET = ["x", "1", "2"]
+FUNCTION_SET = ["+", "-", "*", "/", "log", "sin", "e"]
 EARLY_STOP_PROB = 0.1
 CROSSOVER_RATE = 0.9
 

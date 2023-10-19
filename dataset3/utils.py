@@ -16,10 +16,14 @@ def generate_random_nodes(node, depth, terminal_set, function_set, early_stop_pr
         node = Node(random.choice(function_set))
 
     if node.value in function_set and depth > 0:  # if the node is a function/operator and not at max depth
-        node.left = generate_random_nodes(
+        if node.value in ["sin", "log", "e"]:
+            node.left = generate_random_nodes(
+                node.left, depth-1, terminal_set, function_set, early_stop_prob)
+        else:
+            node.left = generate_random_nodes(
             node.left, depth-1, terminal_set, function_set, early_stop_prob)
-        node.right = generate_random_nodes(
-            node.right, depth-1, terminal_set, function_set, early_stop_prob)
+            node.right = generate_random_nodes(
+                node.right, depth-1, terminal_set, function_set, early_stop_prob)
 
     return node
 
