@@ -1,6 +1,6 @@
 from utils import generate_random_trees_list, train_test_split
 import random
-
+import sympy as sp
 
 class GeneticProgramming:
     def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate):

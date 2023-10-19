@@ -1,6 +1,20 @@
 import random
 import copy
-import math
+import sympy as sp
+import random
+
+
+x = sp.symbols('x')
+
+
+class Node():
+    def __init__(self, value, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return str(self.value)
 
 
 class Tree():
@@ -51,59 +65,38 @@ class Tree():
         choices = ["constant", "variable", "unary_function"]
         choice = random.choice(choices)
         if choice == "constant":
-            node.value = str(random.randint(-3, 3))
+            node.value = random.randint(-3, 3)
         elif choice == "variable":
-            node.value = "x"
+            node.value = x
         else:
-            node.value = random.choice(["sin", "log", "e"])
+            node.value = random.choice(
+                [sp.sin, sp.log, sp.exp])  # Use SymPy functions
             # Ensure the node has only a left child
             node.right = None
             if not node.left:
-                node.left = Node("x")
+                node.left = Node(x)
         return new_tree
 
     def evaluate_tree(self, node, val):
         if not node.left and not node.right:
-            if node.value == 'x':
-                return val
-            else:
-                return int(node.value)
-
-        if node.value in ["sin", "log", "e"]:
-            # Assuming the argument is in the left child
-            arg_val = self.evaluate_tree(node.left, val)
-
-            if node.value == "sin":
-                try:
-                    return math.sin(arg_val)
-                except ValueError:
-                    return 0
-            elif node.value == "log":
-                # Ensure the value is positive before taking log
-                if arg_val <= 0:
-                    return float('-inf')
-                return math.log(arg_val)
-            elif node.value == "e":
-                try:
-                    return math.exp(arg_val)
-                except OverflowError:
-                    # Return positive infinity for large values
+            if isinstance(node.value, sp.Symbol):
+                result = node.value.subs(x, val)
+                if result == sp.zoo:
                     return float('inf')
-
-        left_val = self.evaluate_tree(node.left, val)
-        right_val = self.evaluate_tree(node.right, val)
-
-        if node.value == '+':
-            return left_val + right_val
-        elif node.value == '-':
-            return left_val - right_val
-        elif node.value == '*':
-            return left_val * right_val
-        elif node.value == '/':
-            if right_val == 0:
-                return 0
+                return result.evalf()
             else:
-                return left_val / right_val
+                return node.value
+
+        left_val = self.evaluate_tree(node.left, val) if node.left else None
+        right_val = self.evaluate_tree(node.right, val) if node.right else None
+
+        # For unary functions
+        if node.value in [sp.sin, sp.log, sp.exp]:
+
+            return node.value(left_val).evalf()
+
+        # For binary operators
+        return node.value(left_val, right_val).evalf()
 
     def get_random_node(self):
         return random.choice(self.nodes)
@@ -112,76 +105,15 @@ class Tree():
         return random.choice(self.leaf)
 
     def __str__(self):
-        return self._inorder_string(self.root)
+        expr = self.tree_to_sympy_expr(self.root)
+        return str(expr)
 
-    def _inorder_string(self, node):
-        if not node:
-            return ""
-
-        # If leaf node
+    def tree_to_sympy_expr(self, node):
         if not node.left and not node.right:
-            return str(node.value)
+            return node.value
 
-        left_str = self._inorder_string(node.left)
-        right_str = self._inorder_string(node.right)
+        if node.value in [sp.sin, sp.log, sp.exp]:  # Unary functions
+            return node.value(self.tree_to_sympy_expr(node.left))
 
-        return f"({left_str} {node.value} {right_str})"
-
-
-class Node():
-    def __init__(self, value, left=None, right=None):
-        self.value = value
-        self.left = left
-        self.right = right
-
-    def __str__(self):
-        return self.value
-
-
-# # Test cases here
-# # Test 1: Complex Tree Creation and Evaluation
-# node1 = Node("x")
-# node2 = Node("5")
-# node3 = Node("+", node1, node2)
-
-# node4 = Node("x")
-# node5 = Node("3")
-# node6 = Node("-", node4, node5)
-
-# node7 = Node("*", node3, node6)
-
-# node8 = Node("2")
-# root1 = Node("/", node7, node8)
-
-# tree1 = Tree(root1)
-
-# print("Initial complex tree1 evaluation for x=4:",
-#       tree1.evaluate_tree(tree1.root, 4))
-
-# # Test 2: Mutation
-# tree1.mutate()
-# print("Complex tree1 after mutation, evaluation for x=4:",
-#       tree1.evaluate_tree(tree1.root, 4))
-
-# # Test 3: Crossover
-# node9 = Node("x")
-# node10 = Node("2")
-# node11 = Node("*", node9, node10)
-
-# node12 = Node("x")
-# node13 = Node("3")
-# node14 = Node("/", node12, node13)
-
-# root2 = Node("-", node11, node14)
-
-# tree2 = Tree(root2)
-
-# print("Initial complex tree2 evaluation for x=4:",
-#       tree2.evaluate_tree(tree2.root, 4))
-
-# tree1.crossover(tree2)
-
-# print("Complex tree1 after crossover, evaluation for x=4:",
-#       tree1.evaluate_tree(tree1.root, 4))
-# print("Complex tree2 after crossover, evaluation for x=4:",
-#       tree2.evaluate_tree(tree2.root, 4))
+        # For binary operations
+        return node.value(self.tree_to_sympy_expr(node.left), self.tree_to_sympy_expr(node.right))

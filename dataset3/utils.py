@@ -6,7 +6,6 @@ def generate_random_trees_list(number, depth, terminal_set, function_set, early_
     return [Tree(generate_random_nodes(None, depth, terminal_set, function_set, early_stop_prob)) for _ in range(number)]
 
 
-
 def generate_random_nodes(node, depth, terminal_set, function_set, early_stop_prob):
     if depth == 0 or random.random() < early_stop_prob:
         # Only select from terminal_set if depth is 0 or with early stopping probability
@@ -30,6 +29,7 @@ def train_test_split(dataset, test_ratio=0.2):
     test_set = dataset[:test_size]
     train_set = dataset[test_size:]
     return train_set, test_set
+
 
 # terminal_set = ['+', '-', '*', '/']
 # function_set = ['x'] + [str(i) for i in range(-5, 6)]

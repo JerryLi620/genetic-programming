@@ -1,40 +1,24 @@
 from gp import GeneticProgramming
 from utils import *
-import math
+import sympy as sp
+
+x = sp.symbols('x')
+
+
 # Load dataset
 dataset = []
-dataset = []
-
-# Find min and max values
-min_x = float('inf')
-max_x = float('-inf')
-min_fx = float('inf')
-max_fx = float('-inf')
-
 with open("dataset3/dataset3.csv", 'r') as file:
     lines = file.readlines()[1:]  # Skip the header
     for line in lines:
-        x, fx = map(float, line.strip().split(','))
-        min_x = min(min_x, x)
-        max_x = max(max_x, x)
-        min_fx = min(min_fx, fx)
-        max_fx = max(max_fx, fx)
-
-# Normalize the values to [-10,10]
-with open("dataset3/dataset3.csv", 'r') as file:
-    lines = file.readlines()[1:]  # Skip the header
-    for line in lines:
-        x, fx = map(float, line.strip().split(','))
-        normalized_x = ((x - min_x) / (max_x - min_x)) * 20 - 10
-        normalized_fx = ((fx - min_fx) / (max_fx - min_fx)) * 20 - 10
-        dataset.append((normalized_x, normalized_fx))
+        x, fx = line.strip().split(',')
+        dataset.append((float(x), float(fx)))
 
 # Constants for the GeneticProgramming
 POPULATION_SIZE = 200
 MAX_DEPTH = 3
 MAX_GENERATIONS = 200
-TERMINAL_SET = ["x"] + [str(i) for i in range(-1, 2)]
-FUNCTION_SET = ["+", "-", "*", "/", "sin", "log", "e"]
+TERMINAL_SET = [x, 1, 2, 3]
+FUNCTION_SET = [sp.Add, sp.Mul, sp.sin, sp.log, sp.exp]
 EARLY_STOP_PROB = 0.1
 CROSSOVER_RATE = 0.9
 
