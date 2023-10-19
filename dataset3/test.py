@@ -1,20 +1,15 @@
 from gp import GeneticProgramming
 from utils import *
 import sympy as sp
-
+from read_data import *
 x = sp.symbols('x')
 
 
 # Load dataset
-dataset = []
-with open("dataset3/dataset3.csv", 'r') as file:
-    lines = file.readlines()[1:]  # Skip the header
-    for line in lines:
-        x, fx = line.strip().split(',')
-        dataset.append((float(x), float(fx)))
+dataset = read_csv("test.csv")
 
 # Constants for the GeneticProgramming
-POPULATION_SIZE = 200
+POPULATION_SIZE = 20
 MAX_DEPTH = 3
 MAX_GENERATIONS = 200
 TERMINAL_SET = [x, 1, 2, 3]

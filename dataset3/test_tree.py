@@ -13,4 +13,17 @@ trees = generate_random_trees_list(
 t1 = trees[0]
 t2 = trees[1]
 new1, new2 = t1.crossover(t2)
-print(new1.evaluate_tree(new1.root, 3))
+
+
+dataset = []
+with open("dataset3/test.csv", 'r') as file:
+    lines = file.readlines()[1:]  # Skip the header
+    for line in lines:
+        x, fx = line.strip().split(',')
+        dataset.append((float(x), float(fx)))
+total_absolute_error = 0
+for x, y in dataset:
+    prediction = t1.evaluate_tree(t1.root, x)
+    absolute_error = abs(prediction - y)
+    total_absolute_error += absolute_error
+print(total_absolute_error)

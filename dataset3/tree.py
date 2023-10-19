@@ -1,7 +1,6 @@
 import random
 import copy
 import sympy as sp
-import random
 
 
 x = sp.symbols('x')
@@ -78,24 +77,21 @@ class Tree():
         return new_tree
 
     def evaluate_tree(self, node, val):
+        
         if not node.left and not node.right:
             if isinstance(node.value, sp.Symbol):
                 result = node.value.subs(x, val)
-                if result == sp.zoo:
-                    return float('inf')
-                return result.evalf()
+                return result
             else:
                 return node.value
 
         left_val = self.evaluate_tree(node.left, val) if node.left else None
         right_val = self.evaluate_tree(node.right, val) if node.right else None
-
-        # For unary functions
         if node.value in [sp.sin, sp.log, sp.exp]:
-
             return node.value(left_val).evalf()
 
         # For binary operators
+        
         return node.value(left_val, right_val).evalf()
 
     def get_random_node(self):

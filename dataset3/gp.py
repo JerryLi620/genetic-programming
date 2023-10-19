@@ -2,6 +2,7 @@ from utils import generate_random_trees_list, train_test_split
 import random
 import sympy as sp
 
+
 class GeneticProgramming:
     def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate):
         """
@@ -70,6 +71,7 @@ class GeneticProgramming:
             total_absolute_error += absolute_error
         depth_penalty = regularization_lambda * tree.get_depth()
         total_absolute_error += depth_penalty
+        print(total_absolute_error)
         return total_absolute_error
 
     def evaluate_test_set(self, tree, test_set):
@@ -124,12 +126,17 @@ class GeneticProgramming:
         best_tree_error = float('inf')
 
         for _ in range(num_run):
+            print("start")
             self.population = generate_random_trees_list(
                 self.population_size, self.max_depth, self.terminal_set, self.function_set, self.early_stop)
+            print("population generated")
             self.fitness = self.generate_fitness()
+            print("fitness generated")
+
             for _ in range(self.max_generations):
                 new_population = []
                 for _ in range(self.population_size):
+
                     rand = random.random()
 
                     # Crossover
