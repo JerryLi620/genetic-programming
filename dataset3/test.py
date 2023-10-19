@@ -1,6 +1,5 @@
 from gp import GeneticProgramming
 from utils import *
-import math
 # Load dataset
 dataset = []
 dataset = []
@@ -30,7 +29,7 @@ with open("dataset3.csv", 'r') as file:
         dataset.append((normalized_x, normalized_fx))
 
 # Constants for the GeneticProgramming
-POPULATION_SIZE = 400
+POPULATION_SIZE = 500
 MAX_DEPTH = 3
 MAX_GENERATIONS = 200
 TERMINAL_SET = ["x", "1", "2"]

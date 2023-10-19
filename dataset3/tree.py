@@ -62,17 +62,14 @@ class Tree():
             if node.value == 'x':
                 return val
             else:
-                return int(node.value)
+                return float(node.value)
 
         if node.value in ["sin", "log", "e"]:
             # Assuming the argument is in the left child
             arg_val = self.evaluate_tree(node.left, val)
 
             if node.value == "sin":
-                try:
-                    return math.sin(arg_val)
-                except ValueError:
-                    return 0
+                return math.sin(arg_val)
             elif node.value == "log":
                 # Ensure the value is positive before taking log
                 if arg_val <= 0:
@@ -84,21 +81,21 @@ class Tree():
                 except OverflowError:
                     # Return positive infinity for large values
                     return 0
+        if node.value in ["+", "-", "*", "/"]:
+            left_val = self.evaluate_tree(node.left, val)
+            right_val = self.evaluate_tree(node.right, val)
 
-        left_val = self.evaluate_tree(node.left, val)
-        right_val = self.evaluate_tree(node.right, val)
-
-        if node.value == '+':
-            return left_val + right_val
-        elif node.value == '-':
-            return left_val - right_val
-        elif node.value == '*':
-            return left_val * right_val
-        elif node.value == '/':
-            if right_val == 0:
-                return 0
-            else:
-                return left_val / right_val
+            if node.value == '+':
+                return left_val + right_val
+            elif node.value == '-':
+                return left_val - right_val
+            elif node.value == '*':
+                return left_val * right_val
+            elif node.value == '/':
+                if right_val == 0:
+                    return 0
+                else:
+                    return left_val / right_val
 
     def get_random_node(self):
         return random.choice(self.nodes)
@@ -113,10 +110,15 @@ class Tree():
         if not node:
             return ""
 
-        # If leaf node
-        if not node.left and not node.right:
+        # If leaf node and not a function
+        if not node.left and not node.right and node.value not in ["sin", "log", "e"]:
             return str(node.value)
 
+        # If it's a function
+        if node.value in ["sin", "log", "e"]:
+            arg_str = self._inorder_string(node.left)  # Assuming the argument is always in the left child
+            return f"{node.value}({arg_str})"
+        
         left_str = self._inorder_string(node.left)
         right_str = self._inorder_string(node.right)
 

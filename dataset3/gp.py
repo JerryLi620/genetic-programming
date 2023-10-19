@@ -1,5 +1,6 @@
 from utils import generate_random_trees_list, train_test_split
 import random
+import math
 
 
 class GeneticProgramming:
@@ -38,7 +39,7 @@ class GeneticProgramming:
             fitness.append((tree, self.evaluate(train_set, tree)))
         return fitness
 
-    def select_fit_nodes(self, tournament_ratio=20):
+    def select_fit_nodes(self, tournament_ratio=100):
         """
         Randomly selects some individuals and returns the best among them through the Tournament selection method.
 
@@ -52,7 +53,7 @@ class GeneticProgramming:
             self.fitness, self.population_size//tournament_ratio)
         return min(selected_for_tournament, key=lambda x: x[1])[0]
 
-    def evaluate(self, train_set, tree, regularization_lambda=10):
+    def evaluate(self, train_set, tree, regularization_lambda = 0.1):
         """
         Evaluate the tree's performance on the TRAINING set with a penalty for tree depth to prevent overfitting.
 
@@ -67,12 +68,15 @@ class GeneticProgramming:
         total_error = 0
         for x, y in train_set:
             prediction = tree.evaluate_tree(tree.root, x)
-            error = abs(prediction - y)
+            try:
+                error = abs(prediction - y)**2
+            except:
+                error = float("inf")
             total_error += error
-
-        depth_penalty = regularization_lambda * tree.get_depth()
-        total_error += depth_penalty 
+            depth_penalty = regularization_lambda * tree.get_depth()
+            total_error += depth_penalty 
         return total_error/len(train_set)
+
 
     def evaluate_test_set(self, tree, test_set):
         """
@@ -88,7 +92,10 @@ class GeneticProgramming:
         total_error = 0
         for x, y in test_set:
             prediction = tree.evaluate_tree(tree.root, x)
-            error = abs(prediction - y)
+            try:
+                error = abs(prediction - y)**2
+            except:
+                error = float("inf")
             total_error += error 
         return total_error/len(test_set)
 
@@ -134,7 +141,7 @@ class GeneticProgramming:
             print("fitness created")
             for i in range(self.max_generations):
                 new_population = []
-                for _ in range(self.population_size):
+                while len(new_population) < self.population_size:
                     rand = random.random()
 
                     # Crossover
@@ -153,11 +160,17 @@ class GeneticProgramming:
                         mutant = individual.mutate()
                         new_population.append(individual)
                         new_population.append(mutant)
+
                 # Replace the old population with the new population
                 self.population = new_population
                 self.fitness = self.generate_fitness(train_set)
                 # Check termination criterion for the run
                 if self.terminate():
+                    print("terminate")
+                    print("The best tree is:", min(
+                        self.fitness, key=lambda x: x[1])[0])
+                    print("Its fitness (error) is:", min(
+                        self.fitness, key=lambda x: x[1])[1])
                     break
                 print("The best tree is:", min(
                     self.fitness, key=lambda x: x[1])[0])
