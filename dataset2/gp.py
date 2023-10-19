@@ -38,7 +38,7 @@ class GeneticProgramming:
             fitness.append((tree, self.evaluate(tree)))
         return fitness
 
-    def select_fit_nodes(self, tournament_ratio=20):
+    def select_fit_nodes(self, tournament_ratio=30):
         """
         Randomly selects some individuals and returns the best among them through the Tournament selection method.
 
@@ -52,7 +52,7 @@ class GeneticProgramming:
             self.fitness, self.population_size//tournament_ratio)
         return min(selected_for_tournament, key=lambda x: x[1])[0]
 
-    def evaluate(self, tree, regularization_lambda=0.01):
+    def evaluate(self, tree, regularization_lambda=0.5):
         """
         Evaluate the tree's performance on the TRAINING set with a penalty for tree depth to prevent overfitting.
 
