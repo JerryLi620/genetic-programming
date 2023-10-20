@@ -1,10 +1,10 @@
-from utils import generate_random_trees_list, train_test_split
+from utils import *
 import random
 import math
 
 
 class GeneticProgramming:
-    def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate):
+    def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate, migration_rate, migration_size):
         """
         Initialize the genetic programming class
 
@@ -25,6 +25,8 @@ class GeneticProgramming:
         self.terminal_set = terminal_set
         self.function_set = function_set
         self.early_stop = early_stop
+        self.migration_rate = migration_rate
+        self.migration_size = migration_size
         # self.population = generate_random_trees_list(
         #     population_size, max_depth, terminal_set, function_set, early_stop)
         # self.fitness = self.generate_fitness()
@@ -53,7 +55,7 @@ class GeneticProgramming:
             self.fitness, self.population_size//tournament_ratio)
         return min(selected_for_tournament, key=lambda x: x[1])[0]
 
-    def evaluate(self, train_set, tree, regularization_lambda = 0.1):
+    def evaluate(self, train_set, tree, regularization_lambda=1000):
         """
         Evaluate the tree's performance on the TRAINING set with a penalty for tree depth to prevent overfitting.
 
@@ -74,9 +76,8 @@ class GeneticProgramming:
                 error = float("inf")
             total_error += error
             depth_penalty = regularization_lambda * tree.get_depth()
-            total_error += depth_penalty 
+            total_error += depth_penalty
         return total_error/len(train_set)
-
 
     def evaluate_test_set(self, tree, test_set):
         """
@@ -96,7 +97,7 @@ class GeneticProgramming:
                 error = abs(prediction - y)**2
             except:
                 error = float("inf")
-            total_error += error 
+            total_error += error
         return total_error/len(test_set)
 
     def terminate(self, satisfactory_fitness=0.1):
@@ -112,7 +113,7 @@ class GeneticProgramming:
         best_fitness = min(self.fitness, key=lambda x: x[1])[1]
         return best_fitness <= satisfactory_fitness
 
-    def genetic_algorithm(self, num_run, crossover_rate):
+    def genetic_algorithm(self, num_run, crossover_rate, migration_rate):
         """
         Main genetic algorithm loop for evolving trees.
 
@@ -141,6 +142,8 @@ class GeneticProgramming:
             print("fitness created")
             for i in range(self.max_generations):
                 new_population = []
+                best_tree = min(self.fitness, key=lambda x: x[1])[0]
+                new_population.append(best_tree)
                 while len(new_population) < self.population_size:
                     rand = random.random()
 
@@ -154,6 +157,10 @@ class GeneticProgramming:
                         new_population.append(offspring1)
                         new_population.append(offspring2)
 
+                    elif rand < crossover_rate+migration_rate:
+                        migrations = generate_random_trees_list(
+                            self.migration_size, self.max_depth, self.terminal_set, self.function_set, self.early_stop)
+                        new_population += migrations
                     # Mutation
                     else:
                         individual = self.select_fit_nodes()

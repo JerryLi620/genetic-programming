@@ -54,7 +54,7 @@ class Tree():
         if node.value != "x":
             node.value = "x"
         else:
-            node.value = str(random.randint(0, 2))
+            node.value = str(random.randint(1, 3))
         return new_tree
 
     def evaluate_tree(self, node, val):
@@ -79,6 +79,7 @@ class Tree():
                 try:
                     return math.exp(arg_val)
                 except OverflowError:
+                    
                     # Return positive infinity for large values
                     return 0
         if node.value in ["+", "-", "*", "/"]:
