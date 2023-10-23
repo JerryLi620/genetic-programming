@@ -3,20 +3,7 @@ import random
 
 
 class GeneticProgramming:
-    def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate):
-        """
-        Initialize the genetic programming class
-
-        Params:
-        @dataset: Data to evolve trees.
-        @population_size: Size of the population.
-        @max_depth: Maximum depth of the trees.
-        @max_generations: Number of generations for the algorithm.
-        @terminal_set: Set of terminals (leaf nodes) for the tree.
-        @function_set: Set of function nodes for the trees.
-        @early_stop: Stopping criterion.
-        @crossover_rate: Probability of crossover during reproduction.
-        """
+    def __init__(self, dataset, population_size, max_depth, max_generations, terminal_set, function_set, early_stop, crossover_rate, migration_rate, migration_size):
         self.dataset = dataset
         self.population_size = population_size
         self.max_depth = max_depth
@@ -24,98 +11,47 @@ class GeneticProgramming:
         self.terminal_set = terminal_set
         self.function_set = function_set
         self.early_stop = early_stop
-        # self.population = generate_random_trees_list(
-        #     population_size, max_depth, terminal_set, function_set, early_stop)
-        # self.fitness = self.generate_fitness()
+        self.migration_rate = migration_rate
+        self.migration_size = migration_size
         self.crossover_rate = crossover_rate
 
     def generate_fitness(self):
-        """
-        Calculate and return the fitness for all trees in the population.
-        """
         fitness = []
         for tree in self.population:
             fitness.append((tree, self.evaluate(tree)))
         return fitness
 
-    def select_fit_nodes(self, tournament_ratio=30):
-        """
-        Randomly selects some individuals and returns the best among them through the Tournament selection method.
-
-        Params:
-        @tournament_ratio: Number of individuals to select for tournament.
-
-        Return:
-        The fittest individual from the tournament.
-        """
+    def select_fit_nodes(self, tournament_ratio=100):
         selected_for_tournament = random.sample(
             self.fitness, self.population_size//tournament_ratio)
         return min(selected_for_tournament, key=lambda x: x[1])[0]
 
-    def evaluate(self, tree, regularization_lambda=0.5):
-        """
-        Evaluate the tree's performance on the TRAINING set with a penalty for tree depth to prevent overfitting.
-
-        Params:
-        @tree: The tree to evaluate.
-        @regularization_lambda: Weight for depth penalty.
-
-        Return: 
-        The error with depth penalty.
-        """
-        total_absolute_error = 0
+    def evaluate(self, tree, regularization_lambda=100):
+        total_error = 0
+        n = len(self.dataset)
         for (x1, x2, x3), y in self.dataset:
             prediction = tree.evaluate_tree(tree.root, x1, x2, x3)
-            absolute_error = abs(prediction - y)
-            total_absolute_error += absolute_error
+            error = (prediction - y)**2  # Squaring the error
+            total_error += error
+        mse = total_error / n
         depth_penalty = regularization_lambda * tree.get_depth()
-        total_absolute_error += depth_penalty
-        return total_absolute_error
+        return mse + depth_penalty
 
     def evaluate_test_set(self, tree, test_set):
-        """
-        Evaluate the tree's performance on the test set (no penalties).
-
-        Params:
-        @tree: The tree to evaluate.
-        @test_set: Test dataset.
-
-        Return: 
-        Error on the test set.
-        """
-        total_absolute_error = 0
-        for (x1, x2, x3), y in self.dataset:
+        total_error = 0
+        n = len(test_set)
+        for (x1, x2, x3), y in test_set:
             prediction = tree.evaluate_tree(tree.root, x1, x2, x3)
-            absolute_error = abs(prediction - y)
-            total_absolute_error += absolute_error
-        return total_absolute_error
+            error = (prediction - y)**2  # Squaring the error
+            total_error += error
+        mse = total_error / n
+        return mse
 
-    def terminate(self, satisfactory_fitness=0.1):
-        """
-        Check if the best fitness is below a threshold.
-
-        Params:
-        @satisfactory_fitness: Fitness threshold.
-
-        Return: 
-        True if best fitness is below the threshold, otherwise False.
-        """
+    def terminate(self, satisfactory_fitness=1):  # Adjust this value as needed
         best_fitness = min(self.fitness, key=lambda x: x[1])[1]
         return best_fitness <= satisfactory_fitness
 
-    def genetic_algorithm(self, num_run, crossover_rate):
-        """
-        Main genetic algorithm loop for evolving trees.
-
-        Params:
-        @num_run: Number of runs for the genetic algorithm.
-        @crossover_rate: Probability for crossover.
-        @regularization_lambda: Weight for depth penalty.
-
-        Return: 
-        Best tree from all runs.
-        """
-
+    def genetic_algorithm(self, num_run, crossover_rate, migration_rate):
         # Split the dataset into train and test sets
         train_set, test_set = train_test_split(self.dataset)
         self.dataset = train_set  # Set the dataset to the training set for evaluation
@@ -129,7 +65,9 @@ class GeneticProgramming:
             self.fitness = self.generate_fitness()
             for _ in range(self.max_generations):
                 new_population = []
-                for _ in range(self.population_size):
+                best_tree = min(self.fitness, key=lambda x: x[1])[0]
+                new_population.append(best_tree)
+                while len(new_population) < self.population_size:
                     rand = random.random()
 
                     # Crossover
@@ -141,7 +79,11 @@ class GeneticProgramming:
                         new_population.append(parent2)
                         new_population.append(offspring1)
                         new_population.append(offspring2)
-
+                    elif rand < crossover_rate+migration_rate:
+                        migrations = generate_random_trees_list(
+                            self.migration_size, self.max_depth, self.terminal_set, self.function_set, self.early_stop)
+                        new_population += migrations
+                        
                     # Mutation
                     else:
                         individual = self.select_fit_nodes()
