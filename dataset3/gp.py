@@ -71,7 +71,7 @@ class GeneticProgramming:
         for x, y in train_set:
             prediction = tree.evaluate_tree(tree.root, x)
             try:
-                error = abs(prediction - y)**2
+                error = (prediction - y)**2
             except:
                 error = float("inf")
             total_error += error
@@ -94,7 +94,7 @@ class GeneticProgramming:
         for x, y in test_set:
             prediction = tree.evaluate_tree(tree.root, x)
             try:
-                error = abs(prediction - y)**2
+                error = (prediction - y)**2
             except:
                 error = float("inf")
             total_error += error
